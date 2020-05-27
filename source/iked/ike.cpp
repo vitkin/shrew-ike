@@ -391,11 +391,10 @@ long _IKED::packet_ike_decrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 	// init cipher key and iv
 	//
 
-	EVP_CIPHER_CTX ctx_cipher;
-	EVP_CIPHER_CTX_init( &ctx_cipher );
+	EVP_CIPHER_CTX *ctx_cipher=EVP_CIPHER_CTX_new();
 
 	EVP_CipherInit_ex(
-		&ctx_cipher,
+		ctx_cipher,
 		sa->evp_cipher,
 		NULL,
 		NULL,
@@ -403,11 +402,11 @@ long _IKED::packet_ike_decrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 		0 );
 
 	EVP_CIPHER_CTX_set_key_length(
-		&ctx_cipher,
+		ctx_cipher,
 		( int ) sa->key.size() );
 
 	EVP_CipherInit_ex(
-		&ctx_cipher,
+		ctx_cipher,
 		NULL,
 		NULL,
 		sa->key.buff(),
@@ -419,12 +418,12 @@ long _IKED::packet_ike_decrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 	//
 
 	EVP_Cipher(
-		&ctx_cipher,
+		ctx_cipher,
 		data + sizeof( IKE_HEADER ),
 		data + sizeof( IKE_HEADER ),
 		( int ) size - sizeof( IKE_HEADER ) );
 
-	EVP_CIPHER_CTX_cleanup( &ctx_cipher );
+	EVP_CIPHER_CTX_free( ctx_cipher );
 
 	log.bin(
 		LLOG_DEBUG,
@@ -595,11 +594,10 @@ long _IKED::packet_ike_encrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 	// encrypt all but header
 	//
 
-	EVP_CIPHER_CTX ctx_cipher;
-	EVP_CIPHER_CTX_init( &ctx_cipher );
+	EVP_CIPHER_CTX *ctx_cipher=EVP_CIPHER_CTX_new();
 
 	EVP_CipherInit_ex(
-		&ctx_cipher,
+		ctx_cipher,
 		sa->evp_cipher,
 		NULL,
 		NULL,
@@ -607,11 +605,11 @@ long _IKED::packet_ike_encrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 		1 );
 
 	EVP_CIPHER_CTX_set_key_length(
-		&ctx_cipher,
+		ctx_cipher,
 		( int ) sa->key.size() );
 
 	EVP_CipherInit_ex(
-		&ctx_cipher,
+		ctx_cipher,
 		NULL,
 		NULL,
 		sa->key.buff(),
@@ -619,12 +617,12 @@ long _IKED::packet_ike_encrypt( IDB_PH1 * sa, PACKET_IKE & packet, BDATA * iv )
 		1 );
 
 	EVP_Cipher(
-		&ctx_cipher,
+		ctx_cipher,
 		data + sizeof( IKE_HEADER ),
 		data + sizeof( IKE_HEADER ),
 		( int ) size - sizeof( IKE_HEADER ) );
 
-	EVP_CIPHER_CTX_cleanup( &ctx_cipher );
+	EVP_CIPHER_CTX_free( ctx_cipher );
 
 	//
 	// store cipher iv data

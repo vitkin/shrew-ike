@@ -438,7 +438,8 @@ bool _IDB_PH2::setup_dhgrp()
 		}
 
 		xl.size( dh_size );
-		long result = BN_bn2bin( dh->pub_key, xl.buff() );
+		const BIGNUM *pub_key=DH_get0_pub_key(dh);
+		long result = BN_bn2bin( pub_key, xl.buff() );
 
 		//
 		// fixup public buffer alignment

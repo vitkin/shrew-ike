@@ -664,14 +664,17 @@ static int verify_cb( int ok, X509_STORE_CTX * store_ctx )
 		long ll = LLOG_ERROR;
 		char name[ 512 ];
 
-		X509_NAME * x509_name = X509_get_subject_name( store_ctx->current_cert );
+		X509 *current_cert=X509_STORE_CTX_get_current_cert(store_ctx);
+		X509_NAME * x509_name = X509_get_subject_name( current_cert );
 
 		X509_NAME_oneline(
 			x509_name,
 			name,
 			512 );
 
-		switch( store_ctx->error )
+		int error=X509_STORE_CTX_get_error(store_ctx);
+		int error_depth=X509_STORE_CTX_get_error_depth(store_ctx);
+		switch( error )
 		{
 			case X509_V_ERR_UNABLE_TO_GET_CRL:
 				ok = 1;
@@ -683,9 +686,9 @@ static int verify_cb( int ok, X509_STORE_CTX * store_ctx )
 			ll,
 			"ii : %s(%d) at depth:%d\n"
 			"ii : subject :%s\n",
-			X509_verify_cert_error_string( store_ctx->error ),
-			store_ctx->error,
-			store_ctx->error_depth,
+			X509_verify_cert_error_string( error ),
+			error,
+			error_depth,
 			name );
 	}
 
@@ -857,7 +860,8 @@ bool prvkey_rsa_load_pem( BDATA & prvkey, FILE * fp, BDATA & pass )
 	if( evp_pkey == NULL )
 		return false;
 
-	bool converted = prvkey_rsa_2_bdata( prvkey, evp_pkey->pkey.rsa );
+	RSA *pkr=EVP_PKEY_get0_RSA(evp_pkey);
+	bool converted = prvkey_rsa_2_bdata( prvkey, pkr );
 	EVP_PKEY_free( evp_pkey );
 
 	return converted;
@@ -883,7 +887,8 @@ bool prvkey_rsa_load_p12( BDATA & prvkey, FILE * fp, BDATA & pass )
 	if( evp_pkey == NULL )
 		return false;
 
-	bool converted = prvkey_rsa_2_bdata( prvkey, evp_pkey->pkey.rsa );
+	RSA *pkr=EVP_PKEY_get0_RSA(evp_pkey);
+	bool converted = prvkey_rsa_2_bdata( prvkey, pkr );
 	EVP_PKEY_free( evp_pkey );
 
 	return converted;
@@ -939,7 +944,8 @@ bool prvkey_rsa_load_pem( BDATA & prvkey, BDATA & input, BDATA & pass )
 	if( evp_pkey == NULL )
 		return false;
 
-	bool converted = prvkey_rsa_2_bdata( prvkey, evp_pkey->pkey.rsa );
+	RSA *pkr=EVP_PKEY_get0_RSA(evp_pkey);
+	bool converted = prvkey_rsa_2_bdata( prvkey, pkr );
 	EVP_PKEY_free( evp_pkey );
 
 	return converted;
@@ -976,7 +982,8 @@ bool prvkey_rsa_load_p12( BDATA & prvkey, BDATA & input, BDATA & pass )
 	if( evp_pkey == NULL )
 		return false;
 
-	bool converted = prvkey_rsa_2_bdata( prvkey, evp_pkey->pkey.rsa );
+	RSA *pkr=EVP_PKEY_get0_RSA(evp_pkey);
+	bool converted = prvkey_rsa_2_bdata( prvkey, pkr );
 	EVP_PKEY_free( evp_pkey );
 
 	return converted;
@@ -1010,7 +1017,8 @@ bool _IKED::pubkey_rsa_read( BDATA & cert, BDATA & pubkey )
 	if( evp_pkey == NULL )
 		return false;
 
-	bool result = pubkey_rsa_2_bdata( pubkey, evp_pkey->pkey.rsa );
+	RSA *pkr=EVP_PKEY_get0_RSA(evp_pkey);
+	bool result = pubkey_rsa_2_bdata( pubkey, pkr );
 
 	EVP_PKEY_free( evp_pkey );
 
