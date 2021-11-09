@@ -309,27 +309,27 @@ endif( NOT PATH_LIB_EDIT )
 
 find_package(Threads)
 
-message(
-	STATUS
-	"Using library ${CMAKE_THREAD_LIBS_INIT}" )
-
-if( NOT CMAKE_USE_PTHREADS_INIT )
-
-	message(
-		FATAL_ERROR
-		"Unable to locate required package : pthreads" )
-
-endif( NOT CMAKE_USE_PTHREADS_INIT )
-
-if( NOT APPLE )
-
-	check_library_exists(
-		${CMAKE_THREAD_LIBS_INIT}
-		"pthread_mutex_timedlock"
-		""
-		FUNC_LIB_TIMEDLOCK )
-
-endif( NOT APPLE )
+#message(
+#	STATUS
+#	"Using library ${CMAKE_THREAD_LIBS_INIT}" )
+#
+#if( NOT CMAKE_USE_PTHREADS_INIT )
+#
+#	message(
+#		FATAL_ERROR
+#		"Unable to locate required package : pthreads" )
+#
+#endif( NOT CMAKE_USE_PTHREADS_INIT )
+#
+#if( NOT APPLE )
+#
+#	check_library_exists(
+#		${CMAKE_THREAD_LIBS_INIT}
+#		"pthread_mutex_timedlock"
+#		""
+#		FUNC_LIB_TIMEDLOCK )
+#
+#endif( NOT APPLE )
 
 if( FUNC_LIB_TIMEDLOCK )
 
